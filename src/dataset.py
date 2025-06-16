@@ -62,7 +62,7 @@ def apply_ocr(input: Union[str | Image.Image]) -> Dict:
     annotations = ocrmac.OCR(image, language_preference=['th-TH'], recognition_level='accurate').recognize(px=True)
 
     size_image: Tuple[int] = image.size # (width_image, height_image)
-    sl_texts, _, bboxes = map(list, zip(*annotations))
+    sl_texts, _, bboxes = map(list, zip(*annotations)) if len(annotations) and len(annotations[0]) else ([], [], [])
 
     norm_bboxes: list[Tuple] = []
     for x0, y0, x1, y1 in bboxes:
@@ -313,7 +313,7 @@ def create_feature(
     
     image = convert_to_rgb(image)
 
-    if use_ocr:
+    if (texts is None and bboxes is None) and use_ocr:
         ocr_output: dict = apply_ocr(image)
         texts = ocr_output["single_line_text"]
         bboxes = ocr_output["norm_bbox"]
